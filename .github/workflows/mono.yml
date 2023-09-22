@@ -7,7 +7,7 @@ on:
 
 # Global Cache Settings
 env:
-  GODOT_BASE_BRANCH: "4.2"
+  GODOT_BASE_BRANCH: "master"
   SCONS_CACHE_LIMIT: 4096
 
 jobs:
@@ -73,7 +73,7 @@ jobs:
         env:
           SCONS_CACHE: ${{github.workspace}}/.scons_cache/
         run: |
-          scons -j2 verbose=yes warnings=all werror=yes platform=linuxbsd tests=no target=editor dev_build=no debug_symbols=no module_mono_enabled=yes mono_glue=no copy_mono_root=yes
+          scons -j2 verbose=yes warnings=all werror=yes platform=linuxbsd tests=no target=editor dev_build=no debug_symbols=no module_mono_enabled=yes mono_glue=no copy_mono_root=yes float=64
 
       - name: Generate Mono Glue
         run: |
