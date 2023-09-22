@@ -7,7 +7,7 @@ on:
 
 # Global Cache Settings
 env:
-  GODOT_BASE_BRANCH: "4.1"
+  GODOT_BASE_BRANCH: "4.2"
   SCONS_CACHE_LIMIT: 4096
 
 jobs:
@@ -69,7 +69,7 @@ jobs:
           scons --version
 
       # We should always be explicit with our flags usage here since it's gonna be sure to always set those flags
-      - name: Compile Godot (module_mono_enabled=yes mono_glue=no)
+      - name: Compile Godot (module_mono_enabled=yes mono_glue=no float=64)
         env:
           SCONS_CACHE: ${{github.workspace}}/.scons_cache/
         run: |
@@ -88,9 +88,9 @@ jobs:
             modules/mono/glue/GodotSharp/GodotSharp/Generated/
             modules/mono/glue/GodotSharp/GodotSharpEditor/Generated/
 
-  linux-editor-mono:
-    runs-on: "ubuntu-20.04"
-    name: Linux Editor w/ Mono
+  macos-editor-mono:
+    runs-on: "macos-latest"
+    name: MacOS Editor w/ mono
     needs: mono-glue
 
     steps:
@@ -145,6 +145,11 @@ jobs:
           python --version
           scons --version
 
+      # macOS builds depend on Vulkan SDK
+      - name: Setup Vulkan SDK
+        run: |
+          sh misc/scripts/install_vulkan_sdk_macos.sh
+
       # Download glue from the mono-glue job
       - name: Download Glue
         uses: actions/download-artifact@v3
@@ -161,12 +166,12 @@ jobs:
         env:
           SCONS_CACHE: ${{github.workspace}}/.scons_cache/
         run: |
-          scons -j2 verbose=yes warnings=all werror=yes platform=linuxbsd tests=no target=editor dev_build=no debug_symbols=no module_mono_enabled=yes mono_glue=yes mono_static=yes copy_mono_root=yes
+          scons -j2 verbose=yes warnings=all werror=yes platform=linuxbsd tests=no target=editor dev_build=no debug_symbols=no module_mono_enabled=yes mono_glue=yes mono_static=yes copy_mono_root=yes float=64
 
       # Make build available
       - uses: actions/upload-artifact@v3
         with:
-          name: godot.linuxbsd.editor.x86_64.mono
+          name: godot.macos.editor.x86_64.mono
           path: bin/*
 
   windows-editor-mono:
